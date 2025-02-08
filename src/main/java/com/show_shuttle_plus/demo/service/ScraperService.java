@@ -20,15 +20,30 @@ public class ScraperService {
         //Fetch the html page content
         Document doc = Jsoup.connect(link).get();
 
-        //Select data
-        Elements elements = doc.select("div.detName a.detLink");
+        // Select all rows in the torrent table
+        Elements rows = doc.select("tr");
 
-        System.out.println(elements);
-        for(Element movie : elements) {
-            String title = movie.text();
-            String magnet = movie.attr("href");
-            movies.add(new MovieDetails(title, magnet));
-            System.out.println(movie);
+        for (Element row : rows) {
+            try {
+                MovieDetails movieDetails = new MovieDetails();
+                // Movie Name
+                String title = row.select("div.detName a.detLink").text();
+                // Magnet Link
+                String magnetLink = row.select("td a[title='Download this torrent using magnet']").attr("href");
+
+                // File Size
+                String fileSize = row.select("font.detDesc").text(); // Extracts entire line
+                fileSize = fileSize.replaceAll(".*Size ", "").replaceAll(", ULed.*", ""); // Extracts only size
+
+                movieDetails.setTitle(title);
+                movieDetails.setMagnet(magnetLink);
+                movieDetails.setSize(fileSize);
+
+                // Add to movie list
+                movies.add(movieDetails);
+            } catch (Exception e) {
+                System.err.println("Skipping row due to error: " + e.getMessage());
+            }
         }
 
         return movies;
