@@ -60,7 +60,7 @@ public class WebSecurityConfig {
         http
 
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/users/**", "/scrape/**").permitAll()
+                        .requestMatchers("/users/**", "/movies/**").permitAll()
                         .anyRequest().authenticated()
                 ).csrf(AbstractHttpConfigurer::disable)
                 .anonymous(AnonymousConfigurer::disable);
